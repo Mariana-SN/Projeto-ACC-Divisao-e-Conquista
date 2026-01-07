@@ -5,11 +5,12 @@ def traditional_matrix_mult(A, B):
     r = len(A)
     m = len(A[0])
     c = len(B[0])
-
+    
     print()
     print("Linhas: ", r)
     print("Meio: ", m)
     print("Colunas: ", c)
+
 
     C = [[0 for _ in range(c)] for _ in range(r)]
     for i in range(r):

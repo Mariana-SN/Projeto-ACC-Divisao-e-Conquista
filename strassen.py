@@ -1,3 +1,8 @@
+from time import perf_counter
+
+STRASSEN_RECURSIVE_CALLS = 0
+STRASSEN_SPLIT_JOIN_TIME = 0.0
+
 def zeros(n):
     return [[0 for _ in range(n)] for _ in range(n)]
 
@@ -32,12 +37,18 @@ def join(C11, C12, C21, C22):
     return top + bottom
 
 def strassen_matrix_mult(A, B):
+    global STRASSEN_RECURSIVE_CALLS
+    STRASSEN_RECURSIVE_CALLS += 1
+
     n = len(A)
     if n == 1:
         return [[A[0][0] * B[0][0]]]
 
+    global STRASSEN_SPLIT_JOIN_TIME
+    t0 = perf_counter()
     A11, A12, A21, A22 = split(A)
     B11, B12, B21, B22 = split(B)
+    STRASSEN_SPLIT_JOIN_TIME += (perf_counter() - t0)
 
     M1 = strassen_matrix_mult(add(A11, A22), add(B11, B22))
     M2 = strassen_matrix_mult(add(A21, A22), B11)
@@ -52,7 +63,11 @@ def strassen_matrix_mult(A, B):
     C21 = add(M2, M4)
     C22 = add(sub(add(M1, M3), M2), M6)
 
-    return join(C11, C12, C21, C22)
+    t1 = perf_counter()
+    C = join(C11, C12, C21, C22)
+    STRASSEN_SPLIT_JOIN_TIME += (perf_counter() - t1)
+
+    return C
 
 def shape(M):
     if not M:
@@ -69,7 +84,7 @@ def validate_multiplicable(A, B):
         raise ValueError("Matriz com linhas de comprimentos diferentes.")
     if ac != br:
         raise ValueError(f"Dimensões incompatíveis: A é {ar}x{ac}, B é {br}x{bc}.")
-    
+
 def next_pow2(x):
     p = 1
     while p < x:
@@ -92,19 +107,28 @@ def multiply_strassen(A, B):
     size = next_pow2(max(ar, ac, bc))
     A_pad = pad_matrix(A, size, size)
     B_pad = pad_matrix(B, size, size)
+
+
     C_pad = strassen_matrix_mult(A_pad, B_pad)
-
-    print()
-    print("A:\n", A_pad)
-    print("B:\n", B_pad)
-    print("C:\n", C_pad)
-
     return unpad_matrix(C_pad, ar, bc)
+
+def reset_strassen_stats():
+    global STRASSEN_RECURSIVE_CALLS, STRASSEN_SPLIT_JOIN_TIME
+    STRASSEN_RECURSIVE_CALLS = 0
+    STRASSEN_SPLIT_JOIN_TIME = 0.0
+
+def get_strassen_stats():
+    return STRASSEN_RECURSIVE_CALLS, STRASSEN_SPLIT_JOIN_TIME
+
 
 if __name__ == "__main__":
     A = [[1, 2, 3], [4, 5, 6]]  # Matriz 2x3
     B = [[7, 8], [9, 10], [11, 12]]  # Matriz 3x2
 
+    reset_strassen_stats()
     strassen_result = multiply_strassen(A, B)
+    calls, split_join = get_strassen_stats()
+
     print("\nResultado da multiplicação de matrizes pelo Algoritmo de Strassen:\n", strassen_result)
+    print(f"\nEstatísticas: chamadas_recursivas={calls}, tempo_split_join_segundos={split_join:.6f}")
     print()
