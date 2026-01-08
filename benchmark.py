@@ -1,9 +1,8 @@
-# benchmark.py
 import csv
 import random
 from time import perf_counter
 
-from classic import multiply_traditional
+from classic import multiply_classic
 from strassen import multiply_strassen, reset_strassen_stats, get_strassen_stats
 
 
@@ -19,9 +18,9 @@ def medir_tempo(func, *args, **kwargs):
 
 
 def main():
-    # >>> CONFIG DO BENCHMARK 
-    tamanhos = [64, 128, 256, 512]     # pode adicionar mais: 1024 etc 
-    repeticoes = 3                     # quantas vezes roda cada tamanho
+    # CONFIG DO BENCHMARK 
+    tamanhos =  [64, 128, 256, 512]    # adicionar mais: 2048 etc 
+    repeticoes = 3                     # qtd vezes roda cada tamanho
     seed_base = 42                   
     minimo = 0
     maximo = 10
@@ -48,7 +47,7 @@ def main():
             A = gerar_matriz(n, rng, minimo, maximo)
             B = gerar_matriz(n, rng, minimo, maximo)
 
-            tempo_classico, C_classico = medir_tempo(multiply_traditional, A, B)
+            tempo_classico, C_classico = medir_tempo(multiply_classic, A, B)
 
             reset_strassen_stats()
             tempo_strassen, C_strassen = medir_tempo(multiply_strassen, A, B)

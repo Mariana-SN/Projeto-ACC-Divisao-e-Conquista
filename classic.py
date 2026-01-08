@@ -35,7 +35,7 @@ def validate_multiplicable(A, B):
     if ac != br:
         raise ValueError(f"Dimensões incompatíveis: A é {ar}x{ac}, B é {br}x{bc}.")
 
-def multiply_traditional(A, B):
+def multiply_classic(A, B):
     validate_multiplicable(A, B)
     return traditional_matrix_mult(A, B)
 
@@ -43,5 +43,5 @@ if __name__ == "__main__":
     A = [[1, 2, 3], [4, 5, 6]]  # Matriz 2x3
     B = [[7, 8], [9, 10], [11, 12]]  # Matriz 3x2
 
-    traditional_result = multiply_traditional(A, B)
+    traditional_result = multiply_classic(A, B)
     print("Traditional Matrix Multiplication Result:\n", traditional_result)
